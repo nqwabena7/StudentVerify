@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RichBrains Student Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --primary: #0a3d62;
+      --secondary: #1e90c2;
+      --background: #f4f6f8;
+      --success: #2e8b57;
+      --error: #c0392b;
+      --warning: #f39c12;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--background);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: #fff;
+      max-width: 420px;
+      width: 100%;
+      padding: 35px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--primary);
+      margin-bottom: 5px;
+    }
+
+    .welcome {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--secondary);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 5px 0 0 0;
+      border: 1px solid #ddd;
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    li {
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+
+    li:hover {
+      background: #f0f4f8;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 25px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>RichBrains Institute</h1>
+  <p class="welcome">
+    Welcome to the official student verification portal.<br>
+    Please enter your full name to confirm your eligibility.
+  </p>
+
+  <input id="nameInput" placeholder="Enter your full name" />
+  <ul id="suggestions"></ul>
+
+  <button onclick="verify()">Verify Name</button>
+
+  <div id="result" class="result"></div>
+
+  <footer>
+    © <span id="year"></span> RichBrains. All rights reserved.
+  </footer>
+</div>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+const students = [
+"ADZAMLI SERAPHINE HENDRY","DOGBE HELLEN AFI","ALLOTEH SOPHIA","KWAMI VICTORIA DZIDEDI","OGUNS ELIZABETH",
+"AGBOTSE ELLIOT","STEPHENSON VERONICA ENYONAM","STEPHENSON GLORY JOSIAH","YUSUF ABDULHAMEED","DUKOR GIFTY",
+"AGODOA RUTH","NAJOMBE ABRAHAM","AMOAH KWEJO DOMINIC","TSORMENA BLESS AKOS","AWAYISU EVANS",
+"OBENG JOHN BAOTENG","OYIE JEFFTHA","KESEWA PORTIA AFUA","KODZOKUMAH MAWUSE ABRA","ASARE MERCY DANSOA",
+"PATRICIA AMA DANSO","AIDOO PEARL TAWIAH","ATTAH BLESSING","AMOAH JULIET","ATUBRA PORTIA","OSEI PATRICIA",
+"AMEKO PRINCE","DUNYO CHARLOTTE","KPADE JEHOSHAPHATE KWADZO GODSWAY","PRUDENT AGBESI","ADZAWLA PROSPER",
+"AGBO STEPHEN","DOMPREH RICHARD","AMOAKO ERIC","ROSELINE AKORSIA TSEVI","TIMOTHY KWABENA SASU",
+"MACCARTHY COMFORT","AKROBOR JONATHAN","ALORMENU ESTHER MAWUNYEFIA","SETH OSWALD MACCARTHY",
+"AMEDZI EUGENIA ABRA","DANIELLA AKOSUA SENADJU","APPOH HANNAH","DRAYI CHRISTIANA BLESS","AKOTO ISABELLA",
+"MAVIS GYAU","AMETEFE BLESSING ASHER","MODENU GODSWAY","NKANSAH COSMOS","DUNU DANIELLA YAYRA",
+"MENSAH MARY ETORM","FOLI VINCENTIA","DARRAH JULIUS","DUNYO KELVIN PROSPER","DOGBE ERIC",
+"MAKIBIMBA MERCY NLANDIN","MAKUVIA SABINA MAWUTOR","MAKUVIA ELORM","ASUNDA ALLNICE","AWUAH LENA FAFA",
+"DAVID MITCHEL OPPONG","TASLEEM UGWU SALISU","OCANSEY GRACIOUS KODZO","SAMAH OBED HISWIL JUNIOR",
+"SAMAH KENNETH","TETTEY DAVID","YEBOAH VERA","AGBEMAVOR VENUNYE","NYEWORLEMA DELIGHT",
+"AGBEWU PRISCILLA","AWI EDEM PAUL","KORWU ERICA EFYA","SAKYI ELINAM","TORNYEAVA JERRY",
+"LADZI FRANCIS ATTA KWAME","AGBASA GIFTY","IBRAHIM NURUDEEN","ARKU EMMANUELLA","NYAMEASEM ELIZABETH",
+"OCANSEY TETTEH ELVIS","DAME GODSWAY","AKORLI PRISCILLA AMA","DEBRAH COMFORT","YAWSON HILDA AKU",
+"HEH PRISCILLA","ADOM TALENT KOMLA","OGBEH PRINCE","AKUMATEY EUPHEMIA ABENA","YUSSIF YUHANI",
+"GODZO PATIENCE SELASSIE","MENSAH STELLA","MINDAWA BERNICE DEBRAH","FUSEINI HANDA","KORVE NORA ABLA",
+"AMANOR FELICITY","ANDRENA LEBAWOR ANDANI","ADESSA JOHN","RICHARD MANTEY","ADDAE KOFI JULIUS",
+"ASARE PERSES","TONGBLA MARY","NSEBE SOPHIA","AHIAVOR ANTHONY","AVUGLA YAW JUSTICE",
+"TONGBLA SHINE","KPORNYO CHRISTOPHER","ATIGLAH MARY AKOSUA","AMEDZRO PATIENCE","DONKOR NELSON NYIMBA",
+"PRISCILLA TETTEH","FORNYIKPOR AFI DELA CHANTEL","AZIABU RAUL ABDUL","RICHMOND MANTEY",
+"AGBEMOR MONICA","MENSAH ADELINE ATSUFUI","TSOGBEY AGBO ISABELLA","EGBETORWOKPOR COLE PERRY",
+"MALIK KUWESHAR","SASIRI ALICE","ATIVOE PATRICIA","AVORYI KEMI MERCY","AMEWU ROSALINDA",
+"BABUM SILAS MAKEFEL","MMOR BENEDICT EZRA KWASI DODZI","ADUKPO PATIENCE","FRANCIS TAKYI",
+"AYEWUTSE AUGUSTINE","HAYFORD DORCAS BOAFO","ANANE VICTOR AYINDARGO","OKOH MARY",
+"OLANDEJO PRECIOUS AYOMIDE","OLANDEJO PRAISE AYODEJI","AKORLI REJOICE ABRA","OWUSU GLORIA",
+"ADDO SAMUEL","ADOM DORCAS","MAWUENA ANITA KAFUI","TALIN JOSEPH","TETTEY ALBERT",
+"KPEDOR LORDINA AFEAFA","KANALE AURELLA ATAWA","OSEI WISDOM","BIMEN CYNTHIA","DORKENOO SAMUEL",
+"ALIDU AMAMATU","APAMLEEGA PORTIA","GLADYS OYETEY","DAVOR MABEL","NYAMEKYE ANDREWS",
+"DAKPO FAITH SEYRAM","TSORLENYANU BRIGHT","DZIDE OWUSU BLESS BRIAN","ERNESTICIA ASIEDUA AGYEI",
+"FOSTER DUVOR","ADOM MAXWELL","SALIFU ABASS","FIADOYO MAXWELL","EBITEY SAMUEL",
+"DUWOR BERNICE","FORKUO EVENLYN NTIM","BOANYO AGNES AMA NYARKWAA","ADETI ERICA",
+"AFETORGBOR ISABELLA","DORGAH SAMUEL KOMLA","ENOCH ANSAH","AKOTO ERICA ADJEWA",
+"TUTU DERRICK","POMBI EMMANUEL","KWABEA JEAL","KAMASAH ANGELA","AKABUA EDWINA ELORM",
+"BRANTUO BLESS KOFI","DOGBA CYRIL","MALEKPOR BRIDGET","NABAWAYI REGINA","KEKESI BRIDGET EDEM",
+"ANKU MAVIS MAKAFUI","PASCAL SIMPINEY SEDEM","AFUTU PAUL","POMAA OPHELIA","JULIET KPEKPO",
+"AMOAH DERRICK","LOGOSU FRANCIS JUNIOR","OKAI STEPHANIE DEDE","TUTUWA PRISCILLA",
+"ADATOR STEPHEN","LADZO RICHARD KOFI","LEH RICHLOVE DELADEM","TETTEH ANNABEL",
+"BAKOLOGBEN MOSES YINWONTE","DUVOR THEODORE","LUCKY AKOS AKOTA","KUBI PROMISE KORBI",
+"DZISEVOR DARLINGTON","NYARKO PATRICIA","AKORLI ABIGAIL","ANKU COURAGE KOFI",
+"ARNOLD SESSI","GABISO HILDA ESIANYO","BOATENG MERCILIN","ASAMOAH MICHAEL",
+"DZELU MORRILON ATSU","KWASIKUMA DERRICK","KLAGBO MELODY YAA","GBOLONYO CHARLOTTE",
+"ASIGBE IRENE EURO","FOLI REX ATSU","ABOTSI BLESS MENSAH","CHANIMBE LINDA",
+"ATOBRAH WENDY NANA AMA","BOTSWEY JOHN","GYIMAH BENEDICT","GYIMAH BENEDICTA",
+"YENDINA REBECCA AGYEI","AKAI DOROTHY","RICHMAN ABOTSI","NKEKESI DELADEM",
+"OKOSO EMMANUEL","TORNYI LOVEGRACE","ASHIMEDI FESTUS EDEM","SENYO STELLA FAFALI",
+"AMENYO XORLA ANGELA","TSIGBE ANNAN SELASSIE","RUTH AMUZU","KUMORDJI ABIGAIL",
+"ATSUFE MENSAH","ODIDI OSCAR"
+];
+
+// helpers
+const normalize = s => s.toUpperCase().replace(/\s+/g," ").trim();
+
+function levenshtein(a,b){
+ if(Math.abs(a.length-b.length)>5) return 99;
+ const dp=Array(b.length+1).fill(0).map((_,i)=>i);
+ for(let i=1;i<=a.length;i++){
+  let prev=i;
+  for(let j=1;j<=b.length;j++){
+   const tmp=dp[j];
+   dp[j]=a[i-1]===b[j-1]?prev:Math.min(prev+1,dp[j]+1,dp[j-1]+1);
+   prev=tmp;
+  }
+ }
+ return dp[b.length];
+}
+
+const normalized = students.map(s=>({o:s,n:normalize(s)}));
+const input=document.getElementById("nameInput");
+const box=document.getElementById("suggestions");
+const result=document.getElementById("result");
+
+input.addEventListener("input",()=>{
+ box.innerHTML=""; result.textContent="";
+ const v=input.value; if(v.length<2) return;
+ const nv=normalize(v);
+ normalized
+  .map(s=>({name:s.o,score:levenshtein(nv,s.n)}))
+  .filter(s=>s.score<=4)
+  .sort((a,b)=>a.score-b.score)
+  .slice(0,5)
+  .forEach(s=>{
+   const li=document.createElement("li");
+   li.textContent=s.name;
+   li.onclick=()=>{input.value=s.name; box.innerHTML=""; verify();};
+   box.appendChild(li);
+  });
+});
+
+function verify(){
+ const v=normalize(input.value);
+ box.innerHTML="";
+ if(!v){result.style.color="var(--warning)";result.textContent="⚠ Please enter your full name.";return;}
+ const ok=normalized.some(s=>levenshtein(v,s.n)<=2);
+ result.style.color=ok?"var(--success)":"var(--error)";
+ result.textContent=ok?"✅ Name found on the list":"❌ Name not found on the list";
+}
+</script>
+
+</body>
+</html>
